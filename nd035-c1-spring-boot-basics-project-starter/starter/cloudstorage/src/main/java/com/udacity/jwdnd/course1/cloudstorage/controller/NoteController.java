@@ -19,25 +19,29 @@ import java.util.List;
 @RequestMapping("/notes")
 @Slf4j
 public class NoteController {
+
     private final NoteService noteService;
     private final UserService userService;
 
-//    @GetMapping
-//    public String getNotes(Model model){
-//        model.addAttribute("allNotes", noteService.getAllNotes());
-//        return "home";
-//    }
-
     @PostMapping
-    public String postNotes(Authentication authentication, Note note, Model model){
+    public String postNotes(@RequestParam("noteId") Integer noteId,
+                            @RequestParam("noteTitle") String noteTitle,
+                            @RequestParam("noteDescription") String noteDescription,
+                            Authentication authentication, Model model){
 
         User user = userService.getUser(authentication.getName());
-        note.setUserId(user.getUserId());
-        log.info(" in NoteController -> postNotes -> {} inserted {}" ,authentication.getName(), note);
+        if(noteId != null){
+            noteService.updateNote(noteId, noteTitle, noteDescription, user.getUserId());
+            log.info(" in NoteController -> postNotes -> user : {} updated => noteTitle: {} , noteDescription: {} " ,authentication.getName(), noteTitle, noteDescription);
+            model.addAttribute("successMsg", true);
+            return "result";
+
+        }
+        log.info(" in NoteController -> postNotes -> user : {} inserted => noteTitle: {} , noteDescription: {} " ,authentication.getName(), noteTitle, noteDescription);
 
         String error = null;
 
-        int rowsAdded = noteService.createNote(note);
+        int rowsAdded = noteService.createNote(noteTitle, noteDescription, user.getUserId());
         if(rowsAdded < 0){
             error = "There was an error during your note creation. Please try again.";
         }
@@ -50,13 +54,6 @@ public class NoteController {
         return "result";
     }
 
-    @ModelAttribute("allNotes")
-    public List<Note> getAllNotes(Authentication authentication){
-        User user = userService.getUser(authentication.getName());
-        log.info(" NoteController -> getAllNotes( {} ) ", user.getUserId());
-        return noteService.getAllNotes(user.getUserId());
-    }
-
     @GetMapping("/delete")
     public String deleteNote(@Param("noteId") Integer noteId, Model model){
         noteService.deleteNote(noteId);
@@ -64,6 +61,13 @@ public class NoteController {
         model.addAttribute("successMsg", true);
 
         return "result";
+    }
+
+    @ModelAttribute("allNotes")
+    public List<Note> getAllNotes(Authentication authentication){
+        User user = userService.getUser(authentication.getName());
+        log.info(" NoteController -> getAllNotes( {} ) ", user.getUserId());
+        return noteService.getAllNotes(user.getUserId());
     }
 
 }
