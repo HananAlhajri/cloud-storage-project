@@ -64,7 +64,6 @@ public class NoteController {
         model.addAttribute("successMsg", true);
 
         return "result";
-
     }
 
 }
