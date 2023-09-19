@@ -1,6 +1,8 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import com.udacity.jwdnd.course1.cloudstorage.entity.User;
+import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
+import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
 import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Slf4j
 public class HomeController {
 
+    private final FileService fileService;
     private final NoteService noteService;
     private final UserService userService;
+    private final CredentialService credentialService;
 
     @GetMapping
     public String getHomePage(Authentication authentication, Model model){
@@ -26,6 +30,9 @@ public class HomeController {
         log.info(" HomeController -> getHomePage() for user with Id {} ", user.getUserId() );
         log.info( " all notes for {} ===> {}", user.getUserId(), noteService.getAllNotes(user.getUserId()) );
         model.addAttribute("allNotes", noteService.getAllNotes(user.getUserId()));
+        model.addAttribute("files", fileService.getAllFiles(user.getUserId()));
+        model.addAttribute("notes", noteService.getAllNotes(user.getUserId()));
+        model.addAttribute("credentials", credentialService.getAllCredentials(user.getUserId()));
         return "home";
     }
 
