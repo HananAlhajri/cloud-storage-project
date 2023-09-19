@@ -6,6 +6,7 @@ import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -56,11 +57,11 @@ public class NoteController {
         return noteService.getAllNotes(user.getUserId());
     }
 
-    @DeleteMapping
-    public String deleteNote(Integer noteId, Model model){
+    @GetMapping("/delete")
+    public String deleteNote(@Param("noteId") Integer noteId, Model model){
         noteService.deleteNote(noteId);
 
-            model.addAttribute("successMsg", true);
+        model.addAttribute("successMsg", true);
 
         return "result";
 
