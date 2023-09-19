@@ -9,9 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,16 +21,18 @@ public class NoteController {
     private final NoteService noteService;
     private final UserService userService;
 
+//    @GetMapping
+//    public String getNotes(Model model){
+//        model.addAttribute("allNotes", noteService.getAllNotes());
+//        return "home";
+//    }
+
     @PostMapping
     public String postNotes(Authentication authentication, Note note, Model model){
 
         User user = userService.getUser(authentication.getName());
         note.setUserId(user.getUserId());
         log.info(" in NoteController -> postNotes -> {} inserted {}" ,authentication.getName(), note);
-
-//        noteService.createNote(noteObject);
-
-//        model.addAttribute("", noteService.createNote(note));
 
         String error = null;
 
@@ -46,4 +48,22 @@ public class NoteController {
         }
         return "result";
     }
+
+    @ModelAttribute("allNotes")
+    public List<Note> getAllNotes(Authentication authentication){
+        User user = userService.getUser(authentication.getName());
+        log.info(" NoteController -> getAllNotes( {} ) ", user.getUserId());
+        return noteService.getAllNotes(user.getUserId());
+    }
+
+    @DeleteMapping
+    public String deleteNote(Integer noteId, Model model){
+        noteService.deleteNote(noteId);
+
+            model.addAttribute("successMsg", true);
+
+        return "result";
+
+    }
+
 }
