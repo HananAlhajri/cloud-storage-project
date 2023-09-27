@@ -16,9 +16,4 @@ public interface UserMapper {
     @Options(useGeneratedKeys = true, keyProperty = "userId")
     int register(User user);
 
-//    @Update("UPDATE USERS SET password = #{password} WHERE username = #{username}")
-//    User updateUser(String password, String username);
-//
-//    @Delete("DELETE FROM USERS WHERE username = #{username}")
-//    void deleteUser(String username);
 }

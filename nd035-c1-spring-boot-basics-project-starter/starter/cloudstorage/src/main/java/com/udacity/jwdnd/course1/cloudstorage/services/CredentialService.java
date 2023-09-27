@@ -6,9 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -18,74 +15,20 @@ public class CredentialService {
 
     private final CredentialMapper credentialMapper;
 
-
-    public Credentials uploadCredential(String url,
-                                        String username,
-                                        String password,
-                                        Integer userId) throws IOException {
-        SecureRandom random = new SecureRandom();
-        byte[] key = new byte[16];
-        random.nextBytes(key);
-        String encodedKey = Base64.getEncoder().encodeToString(key);
-        EncryptionService encryptionService = new EncryptionService();
-        String encryptedPassword = encryptionService.encryptValue(password, encodedKey);
-        Credentials newCredential = new Credentials(
-                url,
-                username,
-                encryptedPassword,
-                userId,
-                encodedKey
-        );
-        try {
-            credentialMapper.save(newCredential);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return newCredential;
+    public int createCredential(Credentials credential){
+        return credentialMapper.create(credential);
     }
 
-    public Credentials updateCredential(Integer credentialId,
-                                        String url,
-                                        String username,
-                                        String password,
-                                        Integer userId) throws IOException {
-        SecureRandom random = new SecureRandom();
-        byte[] key = new byte[16];
-        random.nextBytes(key);
-        String encodedKey = Base64.getEncoder().encodeToString(key);
-        EncryptionService encryptionService = new EncryptionService();
-        String encryptedPassword = encryptionService.encryptValue(password, encodedKey);
-        Credentials newCredential = new Credentials(
-                credentialId,
-                url,
-                username,
-                encryptedPassword,
-                userId,
-                encodedKey
-        );
-        try {
-            credentialMapper.update(newCredential);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return newCredential;
+    public void updateCredential(Credentials credential, Integer credentialId){
+        credentialMapper.update(credential, credentialId);
     }
 
-
-//not working properly
     public List<Credentials> getAllCredentials(Integer userId) {
         return credentialMapper.findCredentialsByUserId(userId);
     }
 
-    public void deleteCredential(Integer credentialId) throws IOException {
-        try {
+    public void deleteCredential(Integer credentialId) {
             credentialMapper.deleteById(credentialId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
-    public Credentials decodePassword(Integer credentialId){
-        return credentialMapper.findByCredentialId(credentialId);
-    }
 }

@@ -1,6 +1,7 @@
 package com.udacity.jwdnd.course1.cloudstorage.entity;
 
-import lombok.*;
+import lombok.Data;
+import lombok.AllArgsConstructor;
 
 @Data
 @AllArgsConstructor

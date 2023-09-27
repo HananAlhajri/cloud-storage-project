@@ -2,10 +2,11 @@ package com.udacity.jwdnd.course1.cloudstorage.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Credentials {
     private Integer credentialId;
     private String url;
@@ -14,7 +15,7 @@ public class Credentials {
     private Integer userId;
     private String key;
 
-    public Credentials(String url, String username, String password, Integer userId, String key) {
+    public Credentials(String url, String username, String password, String key, Integer userId) {
         this.url = url;
         this.username = username;
         this.key = key;

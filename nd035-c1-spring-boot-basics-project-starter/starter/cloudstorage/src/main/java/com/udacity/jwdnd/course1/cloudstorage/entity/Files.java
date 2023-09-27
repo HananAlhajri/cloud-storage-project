@@ -14,4 +14,12 @@ public class Files {
     private Long fileSize;
     private Integer userId;
     private byte[] fileData;
+
+    public Files(String fileName, String contentType, Long fileSize, byte[] fileData, Integer userId) {
+        this.fileName = fileName;
+        this.contentType = contentType;
+        this.fileSize = fileSize;
+        this.fileData = fileData;
+        this.userId = userId;
+    }
 }
