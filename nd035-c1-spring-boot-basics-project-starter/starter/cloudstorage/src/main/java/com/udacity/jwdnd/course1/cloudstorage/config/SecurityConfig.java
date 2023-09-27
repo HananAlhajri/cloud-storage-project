@@ -15,10 +15,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationService authenticationService;
 
-
     @Override
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder){
-        authenticationManagerBuilder.authenticationProvider(this.authenticationService);
+        authenticationManagerBuilder.authenticationProvider(authenticationService);
     }
 
     @Override

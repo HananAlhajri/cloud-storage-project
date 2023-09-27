@@ -12,8 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/notes")
@@ -24,24 +22,23 @@ public class NoteController {
     private final UserService userService;
 
     @PostMapping
-    public String postNotes(@RequestParam("noteId") Integer noteId,
-                            @RequestParam("noteTitle") String noteTitle,
+    public String postNotes(@RequestParam("noteId") Integer noteId, @RequestParam("noteTitle") String noteTitle,
                             @RequestParam("noteDescription") String noteDescription,
                             Authentication authentication, Model model){
-
+        String error = null;
         User user = userService.getUser(authentication.getName());
+        Note note = new Note(noteId, noteTitle, noteDescription, user.getUserId());
         if(noteId != null){
-            noteService.updateNote(noteId, noteTitle, noteDescription, user.getUserId());
+            noteService.updateNote(note);
             log.info(" in NoteController -> postNotes -> user : {} updated => noteTitle: {} , noteDescription: {} " ,authentication.getName(), noteTitle, noteDescription);
             model.addAttribute("successMsg", true);
             return "result";
 
         }
         log.info(" in NoteController -> postNotes -> user : {} inserted => noteTitle: {} , noteDescription: {} " ,authentication.getName(), noteTitle, noteDescription);
+//        Note note = new Note(null, noteTitle, noteDescription, user.getUserId());
 
-        String error = null;
-
-        int rowsAdded = noteService.createNote(noteTitle, noteDescription, user.getUserId());
+        int rowsAdded = noteService.createNote(note);
         if(rowsAdded < 0){
             error = "There was an error during your note creation. Please try again.";
         }
@@ -54,20 +51,11 @@ public class NoteController {
         return "result";
     }
 
-    @GetMapping("/delete")
+    @RequestMapping("/delete")
     public String deleteNote(@Param("noteId") Integer noteId, Model model){
         noteService.deleteNote(noteId);
-
         model.addAttribute("successMsg", true);
-
         return "result";
-    }
-
-    @ModelAttribute("allNotes")
-    public List<Note> getAllNotes(Authentication authentication){
-        User user = userService.getUser(authentication.getName());
-        log.info(" NoteController -> getAllNotes( {} ) ", user.getUserId());
-        return noteService.getAllNotes(user.getUserId());
     }
 
 }

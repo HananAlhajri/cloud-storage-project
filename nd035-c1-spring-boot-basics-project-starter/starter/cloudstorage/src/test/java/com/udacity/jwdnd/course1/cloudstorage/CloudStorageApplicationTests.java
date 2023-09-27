@@ -3,7 +3,6 @@ package com.udacity.jwdnd.course1.cloudstorage;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -12,8 +11,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
+
 import java.io.File;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CloudStorageApplicationTests {
 
 	@LocalServerPort
@@ -39,10 +41,142 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
-	public void getLoginPage() {
+	@Order(1)
+	public void unAuthorizedLoginTest() {
+
 		driver.get("http://localhost:" + this.port + "/login");
 		Assertions.assertEquals("Login", driver.getTitle());
+
+		driver.get("http://localhost:" + this.port + "/signup");
+		Assertions.assertEquals("Sign Up", driver.getTitle());
+
+		driver.get("http://localhost:" + this.port + "/home");
+		Assertions.assertEquals("Login", driver.getTitle());
+
 	}
+
+	@Test
+	@Order(2)
+	public void signUpTest() throws InterruptedException {
+
+		driver.get("http://localhost:" + this.port + "/signup");
+		driver.findElement(By.id("inputFirstName")).sendKeys("hanan");
+		driver.findElement(By.id("inputLastName")).sendKeys("mohammed");
+		driver.findElement(By.id("inputUsername")).sendKeys("hanan1");
+		driver.findElement(By.id("inputPassword")).sendKeys("123");
+		Thread.sleep(4000);
+		driver.findElement(By.id("buttonSignUp")).click();
+
+		loginTest();
+		Assertions.assertEquals("Home", driver.getTitle());
+
+		driver.findElement(By.id("buttonLogOut")).click();
+		driver.get("http://localhost:" + this.port + "/home");
+		Assertions.assertEquals("Login", driver.getTitle());
+
+	}
+
+	@Test
+	@Order(3)
+	public void loginTest() throws InterruptedException {
+		driver.get("http://localhost:" + this.port + "/login");
+		driver.findElement(By.id("inputUsername")).sendKeys("hanan1");
+		driver.findElement(By.id("inputPassword")).sendKeys("123");
+		driver.findElement(By.id("login-button")).click();
+		Thread.sleep(4000);
+		Assertions.assertEquals("Home", driver.getTitle());
+
+	}
+
+	@Test
+	@Order(5)
+	public void notesCRUDTest() throws InterruptedException {
+		loginTest();
+
+		// create new note
+		driver.findElement(By.id("nav-notes-tab")).click();
+		Thread.sleep(2000);
+		driver.findElement(By.id("buttonAddNewNote")).click();
+		Thread.sleep(2000);
+		driver.findElement(By.id("note-title")).sendKeys("note test");
+		driver.findElement(By.id("note-description")).sendKeys("- this is a note test");
+		driver.findElement(By.id("buttonNoteSubmit")).click();
+		Thread.sleep(2000);
+		Assertions.assertEquals("Result", driver.getTitle());
+		driver.findElement(By.id("buttonHomePage")).click();
+		Assertions.assertEquals("Home", driver.getTitle());
+
+		// edit note
+		Thread.sleep(2000);
+		driver.findElement(By.id("nav-notes-tab")).click();
+		Thread.sleep(2000);
+
+		driver.findElement(By.id("buttonEditNote")).click();
+
+		Thread.sleep(2000);
+		driver.findElement(By.id("note-title")).sendKeys(" edit note");
+		driver.findElement(By.id("note-description")).sendKeys("  - this is edit test");
+		driver.findElement(By.id("buttonNoteSubmit")).click();
+		Thread.sleep(2000);
+		Assertions.assertEquals("Result", driver.getTitle());
+		driver.findElement(By.id("buttonHomePage")).click();
+		Assertions.assertEquals("Home", driver.getTitle());
+
+
+		// delete note
+		Thread.sleep(2000);
+		driver.findElement(By.id("nav-notes-tab")).click();
+		Thread.sleep(2000);
+		driver.findElement(By.id("deleteNote")).click();
+		Assertions.assertEquals("Result", driver.getTitle());
+
+	}
+
+	@Test
+	@Order(6)
+	public void createCredentialTest() throws InterruptedException {
+		loginTest();
+
+		driver.findElement(By.id("nav-credentials-tab")).click();
+		Thread.sleep(2000);
+		driver.findElement(By.id("buttonNewCredential")).click();
+		Thread.sleep(2000);
+		driver.findElement(By.id("credential-url")).sendKeys("/home");
+		driver.findElement(By.id("credential-username")).sendKeys("hanan1");
+		driver.findElement(By.id("credential-password")).sendKeys("password");
+		driver.findElement(By.id("buttonCredentialSubmit")).click();
+		Thread.sleep(2000);
+		Assertions.assertEquals("Result", driver.getTitle());
+	}
+
+	@Test
+	@Order(7)
+	public void updateCredentialTest() throws InterruptedException {
+		loginTest();
+
+		driver.findElement(By.id("nav-credentials-tab")).click();
+		Thread.sleep(2000);
+		driver.findElement(By.id("buttonEditC")).click();
+		Thread.sleep(2000);
+		driver.findElement(By.id("credential-url")).sendKeys("/test");
+		driver.findElement(By.id("credential-username")).sendKeys(" edit");
+		driver.findElement(By.id("credential-password")).sendKeys(" edit");
+		driver.findElement(By.id("buttonCredentialSubmit")).click();
+		Thread.sleep(2000);
+		Assertions.assertEquals("Result", driver.getTitle());
+	}
+
+	@Test
+	@Order(8)
+	public void deleteCredentialTest() throws InterruptedException {
+		loginTest();
+
+		driver.findElement(By.id("nav-credentials-tab")).click();
+		Thread.sleep(2000);
+		driver.findElement(By.id("deleteCredential")).click();
+		Assertions.assertEquals("Result", driver.getTitle());
+	}
+
 
 	/**
 	 * PLEASE DO NOT DELETE THIS method.
@@ -87,6 +221,7 @@ class CloudStorageApplicationTests {
 		// success message below depening on the rest of your code.
 		*/
 		Assertions.assertTrue(driver.findElement(By.id("success-msg")).getText().contains("You successfully signed up!"));
+		driver.findElement(By.id("login-link")).click();
 	}
 
 	
@@ -176,6 +311,7 @@ class CloudStorageApplicationTests {
 	 * https://spring.io/guides/gs/uploading-files/ under the "Tuning File Upload Limits" section.
 	 */
 	@Test
+	@Order(4)
 	public void testLargeUpload() {
 		// Create a test account
 		doMockSignUp("Large File","Test","LFT","123");

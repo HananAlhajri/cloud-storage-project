@@ -13,8 +13,8 @@ public class NoteService {
 
     private final NoteMapper noteMapper;
 
-    public int createNote(String noteTitle, String noteDescription, Integer userId){
-        return noteMapper.createNote(new Note(null, noteTitle, noteDescription, userId));
+    public int createNote(Note note){
+        return noteMapper.create(note);
     }
 
     public List<Note> getAllNotes(Integer userId) {
@@ -26,7 +26,7 @@ public class NoteService {
     }
 
 
-    public void updateNote(Integer noteId, String noteTitle, String noteDescription, Integer userId) {
-        noteMapper.updateNote(noteId, noteTitle, noteDescription, userId);
+    public void updateNote(Note note) {
+        noteMapper.updateNote(note);
     }
 }
